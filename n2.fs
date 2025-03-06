@@ -1,5 +1,16 @@
-﻿open System
+open System
 
+printf "Введите кол-во строк: "
+let count = Console.ReadLine()
+let check1 = 
+    match System.Int32.TryParse(count) with
+    | true, parsedInt -> parsedInt
+    | false, _ -> 
+        printfn "Ошибка: Введите целое число."
+        exit 1 
+
+let minL = 3 
+let maxL = 7
 
 let generateRand (count: int) (minL: int) (maxL: int) =
     let rnd = new Random()
@@ -10,7 +21,7 @@ let generateRand (count: int) (minL: int) (maxL: int) =
                 let index = rnd.Next(26)
                 char (int 'a' + index) ]
         String(List.toArray chars) ]
-
+        
 let find (stringList: string list) =
     match stringList with
     | [] -> None
@@ -23,18 +34,12 @@ let find (stringList: string list) =
                     acc) head tail
         Some shortest
 
-
-
-
-let count = 10 
-let minL = 3 
-let maxL = 10 
-
-let random = generateRand count minL maxL
+let random = generateRand check1 minL maxL
 
 printfn "Сгенерированный список строк:"
 random |> List.iter (printfn "%s")
 
 match find random with
 | Some shortestString -> printfn "\nСамая короткая строка: %s" shortestString
-| None -> printfn "\nСписок пуст."
+| None -> printfn "Список пуст."
+
