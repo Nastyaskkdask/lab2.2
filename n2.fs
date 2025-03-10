@@ -1,27 +1,25 @@
 open System
 
-printf "Введите кол-во строк: "
-let count = Console.ReadLine()
-let check1 = 
-    match System.Int32.TryParse(count) with
-    | true, parsedInt -> parsedInt
-    | false, _ -> 
-        printfn "Ошибка: Введите целое число."
-        exit 1 
 
-let minL = 3 
-let maxL = 7
+let rnd = new Random()
+
+let generateRandomString (minL: int) (maxL: int) =
+    let length = rnd.Next(minL, maxL + 1)
+    let chars = Array.zeroCreate length
+    for i in 0..length - 1 do
+        let charType = rnd.Next(3) 
+        chars[i] <-
+            match charType with
+            | 0 -> char (rnd.Next(10) + int '0') 
+            | 1 -> char (rnd.Next(26) + int 'a') 
+            | 2 -> char (rnd.Next(26) + int 'A')
+            | _ -> ' '
+    String chars
 
 let generateRand (count: int) (minL: int) (maxL: int) =
-    let rnd = new Random()
     [ for i in 1..count do
-        let length = rnd.Next(minL, maxL + 1)
-        let chars = 
-            [ for j in 1..length do
-                let index = rnd.Next(26)
-                char (int 'a' + index) ]
-        String(List.toArray chars) ]
-        
+        generateRandomString minL maxL ]
+
 let find (stringList: string list) =
     match stringList with
     | [] -> None
@@ -34,12 +32,41 @@ let find (stringList: string list) =
                     acc) head tail
         Some shortest
 
-let random = generateRand check1 minL maxL
+
+printf "Выберите способ ввода списка строк (1 - рандомный, 2 - ручной): "
+let inputMode = Console.ReadLine()
+
+let MyList =
+    match inputMode with
+    | "1" ->
+        printf "Введите кол-во строк: "
+        let size = Console.ReadLine()
+        match System.Int32.TryParse(size) with
+        | true, parsedInt ->
+            let minL = 1
+            let maxL = 10
+            generateRand parsedInt minL maxL
+        | false, _ ->
+            printfn "Ошибка: Введите целое число."
+            exit 1
+    | "2" ->
+        printf "Введите строки (каждую на новой строке, пустая строка - конец ввода):\n"
+        let mutable lines = []
+        let mutable line = Console.ReadLine()
+        while not (String.IsNullOrEmpty(line)) do
+            lines <- line :: lines
+            line <- Console.ReadLine()
+        List.rev lines 
+    | _ ->
+        printfn "Ошибка: Некорректный выбор режима ввода."
+        exit 1
+
 
 printfn "Сгенерированный список строк:"
-random |> List.iter (printfn "%s")
+MyList |> List.iter (printfn "%s")
 
-match find random with
+match find MyList with
 | Some shortestString -> printfn "\nСамая короткая строка: %s" shortestString
-| None -> printfn "Список пуст."
+| None -> printfn "\nСписок пуст."
+
 
